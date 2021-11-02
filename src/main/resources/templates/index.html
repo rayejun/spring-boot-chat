@@ -99,7 +99,7 @@
 
         .m-card .name {
             display: inline-block;
-            margin: 0 0 0 15px;
+            margin: 0 0 0 8px;
             font-size: 1pc
         }
 
@@ -286,10 +286,10 @@
     ws.onmessage = function (e) {
         console.log("Received Message: " + e.data);
         let data = JSON.parse(e.data);
-        if (data.type === 'online') {
+        if (data.type === 'notice') {
             $('#online').html(data.content.online);
             let html = '<li>' +
-                '                   <p class="time"><span>' + data.content.ip + ' 加入聊天室</span></p>' +
+                '                   <p class="time"><span>' + data.content.notice + '</span></p>' +
                 '               </li>';
             $('#msg-list').append(html);
         } else {
