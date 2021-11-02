@@ -167,7 +167,7 @@
             font-size: 9pt;
             color: #fff;
             border-radius: 2px;
-            background-color: #dcdcdc
+            background-color: #dadada;
         }
 
         .m-message .avatar {
@@ -274,7 +274,7 @@
 <script>
     let ws, roomId = 0, userId = guid();
     if ("WebSocket" in window) {
-        ws = new WebSocket("ws://" + location.host + "/websocket?roomId=" + roomId + "&userId=" + userId)
+        ws = new WebSocket("ws://" + location.host + "/websocket?roomId=" + roomId + "&userId=" + userId + "&ip=[[${ip}]]")
     } else {
         alert("您的浏览器不支持WebSocket");
     }
@@ -287,7 +287,11 @@
         console.log("Received Message: " + e.data);
         let data = JSON.parse(e.data);
         if (data.type === 'online') {
-            $('#online').html(data.content);
+            $('#online').html(data.content.online);
+            let html = '<li>' +
+                '                   <p class="time"><span>' + data.content.ip + ' 加入聊天室</span></p>' +
+                '               </li>';
+            $('#msg-list').append(html);
         } else {
             let html = '<li>' +
                 '                   <p class="time"><span>' + data.time.substring(11, 16) + '</span></p>' +

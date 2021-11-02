@@ -2,7 +2,7 @@ package io.rayejun.chat.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.rayejun.chat.utils.JacksonUtil;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Controller
+@Component
 @ServerEndpoint("/websocket")
 public class WebSocketServer {
 
@@ -37,9 +37,12 @@ public class WebSocketServer {
         List<Session> sessionList = getSession(roomId);
         if (!sessionList.isEmpty()) {
             List<Session> sessions = getSession(roomId);
-            Map json = new HashMap<>();
+            Map<String, Object> json = new HashMap<>();
             json.put("type", "online");
-            json.put("content", onlineCount);
+            json.put("content", new HashMap<String, Object>() {{
+                put("online", onlineCount);
+                put("ip", getSessionParameter("ip", session));
+            }});
             for (Session session1 : sessions) {
                 if (session1.isOpen()) {
                     // 发送通知在线人数消息
