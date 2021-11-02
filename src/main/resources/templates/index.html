@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            -webkit-align-items: center;
+            -ms-flex-align: center;
+            align-items: center;
+            display: -webkit-flex;
+            display: flex;
+        }
+
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body, ul {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            color: #4d4d4d;
+            font: 14px/1.4em 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background: #f5f5f5 url('/images/bg.jpg') no-repeat center;
+            background-size: cover;
+            font-smoothing: antialiased;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        #chat {
+            margin: 20px auto;
+            width: 800px;
+            height: 600px;
+            overflow: hidden;
+            border-radius: 3px
+        }
+
+        #chat .main, #chat .sidebar {
+            height: 100%
+        }
+
+        #chat .sidebar {
+            float: left;
+            width: 200px;
+            color: #f4f4f4;
+            background-color: #2e3238
+        }
+
+        #chat .main {
+            position: relative;
+            overflow: hidden;
+            background-color: #eee
+        }
+
+        #chat .m-text {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            background-color: #ffffff;
+        }
+
+        #chat .m-message {
+            height: calc(100% - 10pc)
+        }
+
+        .m-card {
+            padding: 9pt;
+            border-bottom: 1px solid #24272c
+        }
+
+        .m-card footer {
+            margin-top: 10px
+        }
+
+        .m-card .avatar, .m-card .name {
+            vertical-align: middle
+        }
+
+        .m-card .avatar {
+            border-radius: 2px
+        }
+
+        .m-card .name {
+            display: inline-block;
+            margin: 0 0 0 15px;
+            font-size: 1pc
+        }
+
+        .m-list li {
+            padding: 9pt 15px;
+            border-bottom: 1px solid #292c33;
+            cursor: pointer;
+            -webkit-transition: background-color .1s;
+            transition: background-color .1s
+        }
+
+        .m-list li:hover {
+            background-color: hsla(0, 0%, 100%, .03)
+        }
+
+        .m-list li.active {
+            background-color: hsla(0, 0%, 100%, .1)
+        }
+
+        .m-list .avatar, .m-list .name {
+            vertical-align: middle
+        }
+
+        .m-list .avatar {
+            border-radius: 2px
+        }
+
+        .m-list .name {
+            display: inline-block;
+            margin: 0 0 0 15px
+        }
+
+        .m-text {
+            height: 10pc;
+            border-top: 1px solid #ddd
+        }
+
+        .m-text textarea {
+            padding: 10px;
+            height: 75%;
+            width: 100%;
+            border: none;
+            outline: 0;
+            font-family: Micrsofot Yahei, serif;
+            resize: none
+        }
+
+        .m-message {
+            padding: 10px 15px;
+            overflow-y: scroll
+        }
+
+        .m-message li {
+            margin-bottom: 15px
+        }
+
+        .m-message .time {
+            margin: 7px 0;
+            text-align: center
+        }
+
+        .m-message .time > span {
+            display: inline-block;
+            padding: 0 18px;
+            font-size: 9pt;
+            color: #fff;
+            border-radius: 2px;
+            background-color: #dcdcdc
+        }
+
+        .m-message .avatar {
+            float: left;
+            margin: 0 10px 0 0;
+            border-radius: 3px
+        }
+
+        .m-message .text {
+            display: inline-block;
+            position: relative;
+            padding: 0 10px;
+            max-width: calc(100% - 40px);
+            min-height: 30px;
+            line-height: 2.5;
+            font-size: 9pt;
+            text-align: left;
+            word-break: break-all;
+            background-color: #fafafa;
+            border-radius: 4px
+        }
+
+        .m-message .text:before {
+            content: " ";
+            position: absolute;
+            top: 9px;
+            right: 100%;
+            border: 6px solid transparent;
+            border-right-color: #fafafa
+        }
+
+        .m-message .self {
+            text-align: right
+        }
+
+        .m-message .self .avatar {
+            float: right;
+            margin: 0 0 0 10px
+        }
+
+        .m-message .self .text {
+            background-color: #b2e281
+        }
+
+        .m-message .self .text:before {
+            right: inherit;
+            left: 100%;
+            border-right-color: transparent;
+            border-left-color: #b2e281
+        }
+
+        #send {
+            border: 1px solid #e5e5e5;
+            background: #f5f5f5;
+            color: #666;
+            padding: 0 8px;
+            outline: 0;
+            height: 26px;
+            float: right;
+            margin-top: 2px;
+            margin-right: 28px;
+        }
+
+        #send:hover {
+            background: #09bb07;
+            color: #fff;
+            border: 1px solid #09bb07;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="chat">
+    <div class="sidebar">
+        <div class="m-card">
+            <header>
+                <img class="avatar" width="40" height="40" alt="访客" src="/images/avatar.jpg">
+                <p class="name" th:text="${ip}">访客</p>
+            </header>
+            <footer></footer>
+        </div>
+        <div class="m-list">
+            <ul>
+                <li class="active">
+                    <img class="avatar" width="30" height="30" alt="示例介绍" src="/images/avatar.jpg">
+                    <p class="name">当前在线 <span id="online">0</span> 人</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="main">
+        <div class="m-message">
+            <ul id="msg-list"></ul>
+        </div>
+        <div class="m-text">
+            <textarea id="content"></textarea>
+            <button id="send">发送（S）</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script>
+    let ws, roomId = 0, userId = guid();
+    if ("WebSocket" in window) {
+        ws = new WebSocket("ws://" + location.host + "/websocket?roomId=" + roomId + "&userId=" + userId)
+    } else {
+        alert("您的浏览器不支持WebSocket");
+    }
+
+    ws.onopen = function () {
+        console.log("Connection open.");
+    };
+
+    ws.onmessage = function (e) {
+        console.log("Received Message: " + e.data);
+        let data = JSON.parse(e.data);
+        if (data.type === 'online') {
+            $('#online').html(data.content);
+        } else {
+            let html = '<li>' +
+                '                   <p class="time"><span>' + data.time.substring(11, 16) + '</span></p>' +
+                '                   <div class="main ' + (userId === data.userId ? 'self' : '') + '">' +
+                '                       <img class="avatar" width="30" height="30" src="/images/avatar.jpg">' +
+                '                       <div class="text">' + data.content + '</div>' +
+                '                   </div>' +
+                '               </li>';
+            $('#msg-list').append(html);
+        }
+        $(".m-message").scrollTop($(".m-message")[0].scrollHeight);
+    };
+
+    ws.onclose = function () {
+        console.log("Connection closed.");
+    }
+
+    ws.onerror = function () {
+        console.log("error.");
+    }
+
+    $('#send').click(function () {
+        if ($('#content').val() === '') {
+            return;
+        }
+        ws.send(JSON.stringify({type: "msg", roomId: 0, userId: userId, content: $('#content').val()}));
+        $('#content').val('');
+    });
+
+    // 定时发送心跳包
+    setInterval(function () {
+        if (ws.readyState === 1) {
+            ws.send(JSON.stringify({type: "heartbeat"}));
+        }
+    }, 15000);
+
+    function guid() {
+        return 'xxxxxxxxxxxxxxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+</script>
