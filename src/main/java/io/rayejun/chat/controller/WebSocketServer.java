@@ -33,23 +33,7 @@ public class WebSocketServer {
         addOnlineCount();
         String roomId = getSessionParameter("roomId", session);
         addSession(roomId, session);
-
-        List<Session> sessionList = getSession(roomId);
-        if (!sessionList.isEmpty()) {
-            List<Session> sessions = getSession(roomId);
-            Map<String, Object> json = new HashMap<>();
-            json.put("type", "online");
-            json.put("content", new HashMap<String, Object>() {{
-                put("online", onlineCount);
-                put("ip", getSessionParameter("ip", session));
-            }});
-            for (Session session1 : sessions) {
-                if (session1.isOpen()) {
-                    // 发送通知在线人数消息
-                    session1.getBasicRemote().sendText(JacksonUtil.toJson(json));
-                }
-            }
-        }
+        sendOnlineNotice(roomId, session, false);
         System.out.println("有新连接加入！roomId为：" + roomId + "   ID是：" + session.getId() + "    当前在线人数为：" + getOnlineCount());
     }
 
@@ -80,10 +64,11 @@ public class WebSocketServer {
      * 连接关闭调用的方法
      */
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(Session session) throws IOException {
         // 在线数减1
         subOnlineCount();
         String roomId = getSessionParameter("roomId", session);
+        sendOnlineNotice(roomId, session, true);
         removeSession(roomId, session);
         System.out.println("有一连接关闭！ID是：" + session.getId() + "   当前在线人数为：" + getOnlineCount());
 
@@ -102,18 +87,27 @@ public class WebSocketServer {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        // 在线数减1
-        subOnlineCount();
-        String roomId = getSessionParameter("roomId", session);
-        removeSession(roomId, session);
         System.out.println("发生错误！发生时间：" + System.currentTimeMillis() + "  ID是：" + session.getId());
-
-        try {
-            session.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         error.printStackTrace();
+    }
+
+    public void sendOnlineNotice(String roomId, Session session, boolean isClose) throws IOException {
+        List<Session> sessionList = getSession(roomId);
+        if (!sessionList.isEmpty()) {
+            List<Session> sessions = getSession(roomId);
+            Map<String, Object> json = new HashMap<>();
+            json.put("type", "notice");
+            json.put("content", new HashMap<String, Object>() {{
+                put("online", onlineCount);
+                put("notice", getSessionParameter("ip", session) + (isClose ? " 离开聊天室" : " 加入聊天室"));
+            }});
+            for (Session session1 : sessions) {
+                if (session1.isOpen()) {
+                    // 发送通知在线人数消息
+                    session1.getBasicRemote().sendText(JacksonUtil.toJson(json));
+                }
+            }
+        }
     }
 
     public static synchronized int getOnlineCount() {
@@ -121,12 +115,12 @@ public class WebSocketServer {
     }
 
     public static synchronized void addOnlineCount() {
-        WebSocketServer.onlineCount++;
+        ++onlineCount;
     }
 
     public static synchronized void subOnlineCount() {
-        if (WebSocketServer.onlineCount > 0) {
-            WebSocketServer.onlineCount--;
+        if (onlineCount > 0) {
+            --onlineCount;
         }
     }
 
