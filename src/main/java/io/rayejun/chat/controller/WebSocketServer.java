@@ -42,8 +42,7 @@ public class WebSocketServer {
      */
     @OnMessage
     public void onMessage(String message, Session session) throws IOException {
-        Map<String, Object> json = JacksonUtil.parse(message, new TypeReference<Map<String, Object>>() {
-        });
+        Map<String, Object> json = JacksonUtil.parse(message, new TypeReference<Map<String, Object>>() {});
         // type为msg是消息
         if (json.get("type").equals("msg")) {
             List<Session> sessionList = getSession(json.get("roomId").toString());
@@ -115,12 +114,12 @@ public class WebSocketServer {
     }
 
     public static synchronized void addOnlineCount() {
-        ++onlineCount;
+        onlineCount++;
     }
 
     public static synchronized void subOnlineCount() {
         if (onlineCount > 0) {
-            --onlineCount;
+            onlineCount--;
         }
     }
 
