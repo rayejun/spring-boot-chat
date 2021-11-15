@@ -8,7 +8,7 @@
         <version>2.3.8.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>io.rayejun</groupId>
+    <groupId>io.github.rayejun</groupId>
     <artifactId>spring-boot-chat</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-boot-chat</name>
